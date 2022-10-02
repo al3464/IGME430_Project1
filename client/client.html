@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Our simple HTTP server</title>
+  <link rel="stylesheet" type="text/css" href="/style.css">
+
+  <script>
+    let status;
+    let valid = false;
+    let loggedIn = false;
+
+    function sendClick() {
+
+      var selectValue = document.getElementById('page');
+      var value = selectValue.options[selectValue.selectedIndex].value;
+      fetchFunction(value);
+    }
+
+    function setStatus(statusCode) {
+      status = statusCode;
+    }
+
+    function fetchFunction(statusValue) {
+      let url = 'http://127.0.0.1:3000' + statusValue;
+      fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      }).then((response) => {
+        response.json().then((data) => {
+          console.log(data);
+          document.getElementById('title').innerHTML = data.title;
+          document.getElementById('message').innerHTML = data.message;
+          document.getElementById('content').hidden = false;
+        })
+        //console.log(response.json());
+      })
+    }
+  </script>
+</head>
+
+<body>
+  <section id="top">
+    <h3>Status Code Tests</h3>
+    <select id="page">
+      <option value="/success" onchange="getTableType()">Success</option>
+      <option value="/badRequest" onchange="getTableType()">Bad Request</option>
+      <option value="/unauthorized" onchange="getTableType()">Unauthorized</option>
+      <option value="/forbidden" onchange="getTableType()">Forbidden</option>
+      <option value="/internal" onchange="getTableType()">Internal</option>
+      <option value="/notImplemented" onchange="getTableType()">Not Implemented</option>
+      <option value="/notFound" onchange="getTableType()">Not Found</option>
+    </select>
+    <select id="type">
+      <option value="application/json">JSON</option>
+      <option value="text/xml">XML</option>
+    </select>
+    <button id="send" onclick="sendClick()">Send</button>
+  </section>
+  <section id="content" hidden="hidden">
+    <p><span id="title"></span></p>
+    <p><span id="message"></span></p>
+  </section>
+</body>
+
+</html>
