@@ -4,65 +4,131 @@
 <head>
   <title>Our simple HTTP server</title>
   <link rel="stylesheet" type="text/css" href="/style.css">
-
+  <title>Search Bar</title>
   <script>
-    let status;
-    let valid = false;
-    let loggedIn = false;
+    const searchInput = document.querySelector('.input')
 
-    function sendClick() {
+    searchInput.addEventListener("input", (e) => {
+      // inside, we will need to achieve a few things:
+      // 1. declare and assign the value of the event's target to a variable AKA whatever is typed in the search bar
+      let value = e.target.value
 
-      var selectValue = document.getElementById('page');
-      var value = selectValue.options[selectValue.selectedIndex].value;
-      fetchFunction(value);
+      // 2. check: if input exists and if input is larger than 0
+      if (value && value.trim().length > 0) {
+        // 3. redefine 'value' to exclude white space and change input to all lowercase
+        value = value.trim().toLowerCase()
+        // 4. return the results only if the value of the search is included in the person's name
+        // we need to write code (a function for filtering through our data to include the search input value)
+      } else {
+        // 5. return nothing
+        // input is invalid -- show an error message or show no results
+
+      }
+
+    })
+
+    const clearButton = document.getElementById('clear')
+
+    clearButton.addEventListener("click", () => {
+      // 1. write a function that removes any previous results from the page
+    })
+
+    // creating and declaring a function called "setList"
+    // setList takes in a param of "results"
+    function setList(results) {
+
+      for (const person of results) {
+        // creating a li element for each result item
+        const resultItem = document.createElement('li')
+
+        // adding a class to each item of the results
+        resultItem.classList.add('result-item')
+
+        // grabbing the name of the current point of the loop and adding the name as the list item's text
+        const text = document.createTextNode(person.name)
+
+        // appending the text to the result item
+        resultItem.appendChild(text)
+
+        // appending the result item to the list
+        list.appendChild(resultItem)
+      }
     }
 
-    function setStatus(statusCode) {
-      status = statusCode;
+    function clearList() {
+      // looping through each child of the search results list and remove each child
+      while (list.firstChild) {
+        list.removeChild(list.firstChild)
+      }
+    }
+    searchInput.addEventListener("input", (e) => {
+      // inside, we will need to achieve a few things:
+      // 1. declare and assign the value of the event's target to a variable AKA whatever is typed in the search bar
+      let value = e.target.value
+
+      // 2. check: if input exists and if input is larger than 0
+      if (value && value.trim().length > 0) {
+        // 3. redefine 'value' to exclude white space and change input to all lowercase
+        value = value.trim().toLowerCase()
+        // 4. return the results only if the value of the search is included in the person's name
+        // we need to write code (a function for filtering through our data to include the search input value)
+      } else {
+        // 5. return nothing
+        clearList()
+
+      }
+
+    })
+    clearButton.addEventListener("click", () => {
+      clearList()
+    })
+
+    function noResults() {
+      // create an element for the error; a list item ("li")
+      const error = document.createElement('li')
+      // adding a class name of "error-message" to our error element
+      error.classList.add('error-message')
+
+      // creating text for our element
+      const text = document.createTextNode('No results found. Sorry!')
+      // appending the text to our element
+      error.appendChild(text)
+      // appending the error to our list element
+      list.appendChild(error)
     }
 
-    function fetchFunction(statusValue) {
-      let url = 'http://127.0.0.1:3000' + statusValue;
-      fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      }).then((response) => {
-        response.json().then((data) => {
-          console.log(data);
-          document.getElementById('title').innerHTML = data.title;
-          document.getElementById('message').innerHTML = data.message;
-          document.getElementById('content').hidden = false;
-        })
-        //console.log(response.json());
-      })
+    function setList(results) {
+      clearList()
+      for (const person of results) {
+        const resultItem = document.createElement('li')
+        resultItem.classList.add('result-item')
+        const text = document.createTextNode(person.name)
+        resultItem.appendChild(text)
+        list.appendChild(resultItem)
+      }
+
+      if (results.length === 0) {
+        noResults()
+      }
     }
   </script>
 </head>
 
 <body>
-  <section id="top">
-    <h3>Status Code Tests</h3>
-    <select id="page">
-      <option value="/success" onchange="getTableType()">Success</option>
-      <option value="/badRequest" onchange="getTableType()">Bad Request</option>
-      <option value="/unauthorized" onchange="getTableType()">Unauthorized</option>
-      <option value="/forbidden" onchange="getTableType()">Forbidden</option>
-      <option value="/internal" onchange="getTableType()">Internal</option>
-      <option value="/notImplemented" onchange="getTableType()">Not Implemented</option>
-      <option value="/notFound" onchange="getTableType()">Not Found</option>
-    </select>
-    <select id="type">
-      <option value="application/json">JSON</option>
-      <option value="text/xml">XML</option>
-    </select>
-    <button id="send" onclick="sendClick()">Send</button>
-  </section>
-  <section id="content" hidden="hidden">
-    <p><span id="title"></span></p>
-    <p><span id="message"></span></p>
-  </section>
+  <div class="form-container">
+    <form class="form">
+      <input id="search" type="text" class="input" placeholder="search..." />
+      <button id="search" class="search-results">search</button>
+      <button id="clear" class="clear-results">clear</button>
+      
+    </form>
+
+  </div>
+  <div class="results-container">
+    <ul class="results-list" id="list">
+
+    </ul>
+  </div>
 </body>
 
 </html>
