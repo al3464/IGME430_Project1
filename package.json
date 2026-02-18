@@ -1,0 +1,27 @@
+{
+  "name": "igme430_project1",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/al3464/IGME430_Project1#readme",
+  "bugs": {
+    "url": "https://github.com/al3464/IGME430_Project1/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/al3464/IGME430_Project1.git"
+  },
+  "license": "ISC",
+  "author": "ArcherLai",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./src/server.js",
+    "pretest": "eslint ./src --fix"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.0.0",
+    "globals": "^17.3.0"
+  }
+}

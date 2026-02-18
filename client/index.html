@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>ArcherLai_Project1</title>
+  <link rel="stylesheet" type="text/css" href="/style.css">
+  
+  <script> 
+ 
+      
+  </script>
+</head>
+<body>
+  <section id="top">
+    <h3>Kitten Birthday Log</h3>
+
+ <form id="userForm" action="/getUsers" method="get">
+    <label for="start">Date</label>
+    <input type="date" id="start" name="trip-start" min="1990-01-01" max="2026-12-31">
+  
+    
+      <label for="name">Name </label>
+      <input id="nameField" type="text" name="name" />
+      <label for="age">Age </label>
+      <input id="ageField" type="number" name="age" min="0" max="100" step="1"/>
+      
+      <label for="breeds">Cat Breed </label>
+      <select id='catBreeds'>
+        <option value='/ragdoll'>Ragdoll</option>
+        <option value='/bengal'>Bengal</option>
+        <option value='/sphynx'>Sphynx</option>
+        <option value='/scottishFold'>Scottish Fold</option>
+        <option value='/siamese'>Siamese</option>
+        <option value='/domesticShorthair'>Domestic Shorhair</option>
+        <option value='/americanShorthair'>American Shorthair</option>
+      </select>
+      <input type="submit" value="Add" />
+    </form>
+  </section>
+  <section id="content">
+  </section>
+
+</body>
+</html>
