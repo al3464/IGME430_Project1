@@ -5,16 +5,113 @@
   <link rel="stylesheet" type="text/css" href="/style.css">
   
   <script> 
+  const handleResponse = async (response, parseResponse) => {
  
+    if(parseResponse) {
+        //Parse the response to json. This is an async function, so we will await it.
+        const obj = await response.json();
+        let jsonString = JSON.stringify(obj);
+        //To display the data easily, we will just stringify it again and display it.
+        
+        content.innerHTML += `<p>${jsonString}</p>`;
+        console.log(obj);
+      } else {
+        //If we don't have a response to parse, just say we recieved metadata
+        content.innerHTML += '<p>Meta Data Received</p>';
+      }
+  }
+
+  const sendPost = async (userForm) => {
+      //Grab all the info from the form
+      const url = userForm.getAttribute('action');
+      const method = userForm.getAttribute('method');
+      
+      const name = userForm.querySelector('#nameField').value;
+      const age = userForm.querySelector('#ageField').value;
+      const ageNum = Number(age);
+      //Build a data string in the FORM-URLENCODED format.
+      let formData = `name=${name}&age=${ageNum}`;
+
+      //If the user selected JSON, send that instead
+ 
+
+      //Make a fetch request and await a response. Set the method to
+      //the one provided by the form (POST). Set the headers. Content-Type
+      //is the type of data we are sending. Accept is the data we would like
+      //in response. Then add our FORM-URLENCODED string as the body of the request.
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type':'application/x-www-form-urlencoded',
+          'Accept': 'application/json',
+        },
+        body: formData,
+      });
+      
+      //get cats birthday
+        const dateInput = document.getElementById('start').value;
+        const selectedBirthday = new Date(dateInput + 'T00:00:00');
+        const today = new Date();
+        const todayDate = new Date(today.getFullYear() - ageNum, today.getMonth(), today.getDate());
+        const birthBool =  today.getFullYear() - selectedBirthday.getFullYear();
+        const catsBirthday = new Date(selectedBirthday.getFullYear(), selectedBirthday.getMonth(), selectedBirthday.getDate());
+        const birthdayLeft = Math.round((selectedBirthday - todayDate) / (1000 * 60 * 60 * 24));
+        
+
+        console.log(birthdayLeft);
+        console.log(formData);
+        const catsAge = ageNum + 1;
+        const invalidAge = today.getFullYear() - selectedBirthday.getFullYear();
+
+
+        if(birthdayLeft > 0 && birthBool === ageNum){
+            content.innerHTML += `<p>${name} will be ${catsAge} in ${birthdayLeft} days!1<p>`;
+        }else if(birthdayLeft === 0 && birthBool === ageNum){
+            content.innerHTML += `<p>${name}'s birthday is today! Happy Birthday!!<p>`;
+        }else if(birthdayLeft < 0 && birthBool === ageNum){
+            content.innerHTML += `<p>${name} will be ${catsAge} in ${birthdayLeft + 365} days<p>`;
+        }else{
+            content.innerHTML += `<p>Your input is invalid<p>`;
+        }
+           
+
+      //Once we have a response, handle it.
+      handleResponse(response, method === 'post');
+    };
+
+
+  const init = () => {
+      //grab form
+      const userForm = document.querySelector('#userForm');
+     
+        const catBreeds = userForm.querySelector('#catBreeds').value;
+        const catImage = document.getElementById('catImage');
+        const imagePath = `${catBreeds}`;
+
+      const addUser = (e) => {
+        e.preventDefault();
+        sendPost(userForm);    
+        catImage.src = imagePath;
+        return false;
+      }
+      
+      //Call addUser when the submit event fires on the form.
+      userForm.addEventListener('submit', addUser);
+    };
+
+    window.onload = init;
+
       
   </script>
 </head>
 <body>
   <section id="top">
     <h3>Kitten Birthday Log</h3>
-
- <form id="userForm" action="/getUsers" method="get">
-    <label for="start">Date</label>
+    <img id="catImage" src="getImage" width="600" height="400">
+    <section id="content">
+    </section>
+    <form id="userForm" action="/addCat" method="post">
+    <label for="start">Meow's Date of Birth</label>
     <input type="date" id="start" name="trip-start" min="1990-01-01" max="2026-12-31">
   
     
@@ -30,13 +127,12 @@
         <option value='/sphynx'>Sphynx</option>
         <option value='/scottishFold'>Scottish Fold</option>
         <option value='/siamese'>Siamese</option>
+        <option value='/maineCoon'>Maine Coon</option>
         <option value='/domesticShorthair'>Domestic Shorhair</option>
         <option value='/americanShorthair'>American Shorthair</option>
       </select>
       <input type="submit" value="Add" />
     </form>
-  </section>
-  <section id="content">
   </section>
 
 </body>
