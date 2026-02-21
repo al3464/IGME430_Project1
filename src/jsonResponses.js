@@ -68,6 +68,10 @@ const respondJSON = (request, response, status, object) => {
     return respondJSON(request, response, responseCode, responseJSON);
   }
 
+  const getNotFound = (request, response) => {
+    const acceptHeader = request.headers.accept;
+   return respondJSON(request, response, 404, '/notFound');
+  };
 
   }
 

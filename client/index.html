@@ -48,29 +48,30 @@
         body: formData,
       });
       
-      //get cats birthday
+    
+      //get cat's birthday 
         const dateInput = document.getElementById('start').value;
         const selectedBirthday = new Date(dateInput + 'T00:00:00');
         const today = new Date();
-        const todayDate = new Date(today.getFullYear() - ageNum, today.getMonth(), today.getDate());
-        const birthBool =  today.getFullYear() - selectedBirthday.getFullYear();
-        const catsBirthday = new Date(selectedBirthday.getFullYear(), selectedBirthday.getMonth(), selectedBirthday.getDate());
-        const birthdayLeft = Math.round((selectedBirthday - todayDate) / (1000 * 60 * 60 * 24));
+        const selectDate = new Date(today.getFullYear(), selectedBirthday.getMonth(), selectedBirthday.getDate());
+        const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const daysLeft = Math.round((todayDate - selectDate) / (1000 * 60 * 60 * 24));
+        const correctAge = today.getFullYear() - selectedBirthday.getFullYear();
         
-
-        console.log(birthdayLeft);
+        
+        console.log(daysLeft);
         console.log(formData);
         const catsAge = ageNum + 1;
-        const invalidAge = today.getFullYear() - selectedBirthday.getFullYear();
 
 
-        if(birthdayLeft > 0 && birthBool === ageNum){
-            content.innerHTML += `<p>${name} will be ${catsAge} in ${birthdayLeft} days!1<p>`;
-        }else if(birthdayLeft === 0 && birthBool === ageNum){
-            content.innerHTML += `<p>${name}'s birthday is today! Happy Birthday!!<p>`;
-        }else if(birthdayLeft < 0 && birthBool === ageNum){
-            content.innerHTML += `<p>${name} will be ${catsAge} in ${birthdayLeft + 365} days<p>`;
-        }else{
+      if (daysLeft > 0 && correctAge === ageNum){
+        content.innerHTML += `<p>${name}'s birthday has already passed this year!<p>`
+      }
+      else if (daysLeft < 0 && correctAge - 1 === ageNum){
+        content.innerHTML += `<p>${name} will be ${catsAge} in ${daysLeft * -1} days!<p>`
+      }else if(daysLeft === 0 && correctAge === ageNum){
+        content.innerHTML += `<p>${name}'s birthday is today! Happy Birthday!!<p>`;
+      }else{
             content.innerHTML += `<p>Your input is invalid<p>`;
         }
            
@@ -107,7 +108,7 @@
 <body>
   <section id="top">
     <h3>Kitten Birthday Log</h3>
-    <img id="catImage" src="getImage" width="600" height="400">
+    <img id="catImage" src="default" width="600" height="400">
     <section id="content">
     </section>
     <form id="userForm" action="/addCat" method="post">

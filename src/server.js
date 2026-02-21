@@ -65,22 +65,17 @@ const handlePost = (request, response, parsedUrl) => {
     }
   };
 
-  const handleGet = (request, response, parsedUrl) => {
-    // route to correct method based on url
-    if(parsedUrl.pathname === '/'){
-      htmlHandler.getIndex(request, response);
-    }
-    else if (parsedUrl.pathname === '/style.css') {
-      cssHandler.getCssFile(request, response);
-    }
-    else if(parsedUrl.pathname === '/getImage'){
-        imgHandler.getImage(request, response)
-    } else if(parsedUrl.pathname === '/ragdoll'){
-        imgHandler.getRagdoll(request, response)
-    }else {
-        htmlHandler.getIndex(request, response);
-    }
-  };
+  const urlStruct = {
+    '/': htmlHandler.getIndex,
+    '/style.css': cssHandler.getCssFile,
+    '/default': imgHandler.getDefault,
+    '/ragdoll': imgHandler.getRagdoll,
+    '/siamese': imgHandler.getSiamese,
+    notFound: htmlHandler.getIndex,
+
+  }
+  
+ 
 
   const onRequest = (request, response) => {
     console.log(request.url);
@@ -89,7 +84,15 @@ const handlePost = (request, response, parsedUrl) => {
     if (request.method === 'POST') {
         handlePost(request, response, parsedUrl);
       } else {
-        handleGet(request, response, parsedUrl);
+        //handleGet(request, response, parsedUrl);
+        const handler = urlStruct[parsedUrl.pathname];
+        if (handler) {
+          //pass in correct url
+          handler(request, response, parsedUrl);
+        } else {
+          // any invalid input will trigger notFound
+          urlStruct.notFound(request, response, parsedUrl);
+        }
       }
 }
 
