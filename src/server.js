@@ -71,6 +71,12 @@ const handlePost = (request, response, parsedUrl) => {
     '/default': imgHandler.getDefault,
     '/ragdoll': imgHandler.getRagdoll,
     '/siamese': imgHandler.getSiamese,
+    '/bengal':imgHandler.getBengal,
+    '/exoticShorthair': imgHandler.getExoticShorthair,
+    '/maine': imgHandler.getMaine,
+    '/scottishFold': imgHandler.getScottishFold,
+    '/sphynx':imgHandler.getSphynx,
+    '/amShorthair':imgHandler.getAmShorthair,
     notFound: htmlHandler.getIndex,
 
   }

@@ -13,11 +13,11 @@
         let jsonString = JSON.stringify(obj);
         //To display the data easily, we will just stringify it again and display it.
         
-        content.innerHTML += `<p>${jsonString}</p>`;
+        //content.innerHTML += `<p>${jsonString}</p>`;
         console.log(obj);
       } else {
         //If we don't have a response to parse, just say we recieved metadata
-        content.innerHTML += '<p>Meta Data Received</p>';
+        //content.innerHTML += '<p>Meta Data Received</p>';
       }
   }
 
@@ -47,8 +47,35 @@
         },
         body: formData,
       });
-      
-    
+
+      const cardContainer = document.getElementById('card-container');
+      const MAX_CARDS = 9;
+      if (cardContainer.children.length >= MAX_CARDS) {
+          alert(`${MAX_CARDS} cats maximum!`);
+          return false;
+        }
+
+        const breedSelect = userForm.querySelector('#catBreeds');
+        const breedValue = breedSelect.value;     
+        const breedText = breedSelect.options[breedSelect.selectedIndex].text;
+        const birthDate = userForm.querySelector('#start').value;
+
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        
+        const img = document.createElement('img');
+        img.src = breedValue;
+        img.alt = breedText;
+        // 图片加载失败时显示默认图片
+        img.onerror = function() {
+          this.src = '/default';
+        };
+
+        const birthdayMessage = document.createElement('div');
+        //birthdayMessage.innerHTML = 
+
+
       //get cat's birthday 
         const dateInput = document.getElementById('start').value;
         const selectedBirthday = new Date(dateInput + 'T00:00:00');
@@ -65,17 +92,21 @@
 
 
       if (daysLeft > 0 && correctAge === ageNum){
-        content.innerHTML += `<p>${name}'s birthday has already passed this year!<p>`
+        birthdayMessage.innerHTML += `<p>${name}'s birthday has already passed this year!<p>`
       }
       else if (daysLeft < 0 && correctAge - 1 === ageNum){
-        content.innerHTML += `<p>${name} will be ${catsAge} in ${daysLeft * -1} days!<p>`
+        birthdayMessage.innerHTML += `<p>${name} will be ${catsAge} in ${daysLeft * -1} days!<p>`
       }else if(daysLeft === 0 && correctAge === ageNum){
-        content.innerHTML += `<p>${name}'s birthday is today! Happy Birthday!!<p>`;
+        birthdayMessage.innerHTML +=  `<p>${name}'s birthday is today! Happy Birthday!!<p>`;
       }else{
-            content.innerHTML += `<p>Your input is invalid<p>`;
+        birthdayMessage.innerHTML +=  `<p>Your input is invalid<p>`;
         }
            
+        card.appendChild(img);
+        card.appendChild(birthdayMessage);
+        cardContainer.appendChild(card);
 
+        
       //Once we have a response, handle it.
       handleResponse(response, method === 'post');
     };
@@ -83,16 +114,45 @@
 
   const init = () => {
       //grab form
-      const userForm = document.querySelector('#userForm');
-     
-        const catBreeds = userForm.querySelector('#catBreeds').value;
-        const catImage = document.getElementById('catImage');
-        const imagePath = `${catBreeds}`;
-
+        const userForm = document.querySelector('#userForm');
+        //const catImage = document.getElementById('catImage');
       const addUser = (e) => {
         e.preventDefault();
-        sendPost(userForm);    
-        catImage.src = imagePath;
+
+        const name = userForm.querySelector('#nameField').value.trim();
+        const age = userForm.querySelector('#ageField').value.trim();
+        const birthDate = userForm.querySelector('#start').value;
+        const nameError = document.getElementById('nameError');
+        const ageError = document.getElementById('ageError');
+        const birthError = document.getElementById('birthError');
+
+        // clear all errors
+        nameError.textContent = '';
+        ageError.textContent = '';
+        birthError.textContent = '';
+
+        let hasError = false;
+
+
+        if (!name) {
+            nameError.textContent = 'name required';
+            hasError = true;
+        }
+        if (!age) {
+            ageError.textContent = 'age required';
+            hasError = true;
+        }
+        if (!birthDate) {
+            birthError.textContent = 'birth required';
+            hasError = true;
+        }
+        if (hasError) {
+            return false; // prevent adding data
+        }
+        sendPost(userForm);  
+        //const catBreeds = userForm.querySelector('#catBreeds').value;  
+        //catImage.src = catBreeds;
+        //  <img id="catImage" src="default" width="600" height="400">
         return false;
       }
       
@@ -108,28 +168,32 @@
 <body>
   <section id="top">
     <h3>Kitten Birthday Log</h3>
-    <img id="catImage" src="default" width="600" height="400">
-    <section id="content">
-    </section>
+    <div>fill out below's info to create cat's card!</div>
+    <div id="card-container" class="card-container"></div>
     <form id="userForm" action="/addCat" method="post">
     <label for="start">Meow's Date of Birth</label>
     <input type="date" id="start" name="trip-start" min="1990-01-01" max="2026-12-31">
+    <span id="birthError" class="error"></span>
   
     
       <label for="name">Name </label>
       <input id="nameField" type="text" name="name" />
+      <span id="nameError" class="error"></span>
+
       <label for="age">Age </label>
       <input id="ageField" type="number" name="age" min="0" max="100" step="1"/>
+      <span id="ageError" class="error"></span>
       
       <label for="breeds">Cat Breed </label>
       <select id='catBreeds'>
         <option value='/ragdoll'>Ragdoll</option>
+        <option value='/maine'>Maine</option>
         <option value='/bengal'>Bengal</option>
         <option value='/sphynx'>Sphynx</option>
         <option value='/scottishFold'>Scottish Fold</option>
         <option value='/siamese'>Siamese</option>
         <option value='/maineCoon'>Maine Coon</option>
-        <option value='/domesticShorthair'>Domestic Shorhair</option>
+        
         <option value='/americanShorthair'>American Shorthair</option>
       </select>
       <input type="submit" value="Add" />
