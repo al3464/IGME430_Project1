@@ -48,6 +48,35 @@
         body: formData,
       });
 
+
+        const nameError = document.getElementById('nameError');
+        const ageError = document.getElementById('ageError');
+        const birthError = document.getElementById('birthError');
+        const dateInput = document.getElementById('start').value;
+
+        // clear all errors
+        nameError.textContent = '';
+        ageError.textContent = '';
+        birthError.textContent = '';
+
+        let hasError = false;
+
+
+        if (!name) {
+            nameError.textContent = 'name required';
+            hasError = true;
+        }
+        if (!age) {
+            ageError.textContent = 'age required';
+            hasError = true;
+        }
+        if (!dateInput) {
+            birthError.textContent = 'birth required';
+            hasError = true;
+        }
+        if (hasError) {
+            return false; // prevent adding data
+        }
       const cardContainer = document.getElementById('card-container');
       const MAX_CARDS = 9;
       if (cardContainer.children.length >= MAX_CARDS) {
@@ -77,7 +106,6 @@
 
 
       //get cat's birthday 
-        const dateInput = document.getElementById('start').value;
         const selectedBirthday = new Date(dateInput + 'T00:00:00');
         const today = new Date();
         const selectDate = new Date(today.getFullYear(), selectedBirthday.getMonth(), selectedBirthday.getDate());
@@ -99,7 +127,7 @@
       }else if(daysLeft === 0 && correctAge === ageNum){
         birthdayMessage.innerHTML +=  `<p>${name}'s birthday is today! Happy Birthday!!<p>`;
       }else{
-        birthdayMessage.innerHTML +=  `<p>Your input is invalid<p>`;
+        birthdayMessage.innerHTML +=  `<p>Your age and birth does not match. <p>`;
         }
            
         card.appendChild(img);
@@ -118,37 +146,6 @@
         //const catImage = document.getElementById('catImage');
       const addUser = (e) => {
         e.preventDefault();
-
-        const name = userForm.querySelector('#nameField').value.trim();
-        const age = userForm.querySelector('#ageField').value.trim();
-        const birthDate = userForm.querySelector('#start').value;
-        const nameError = document.getElementById('nameError');
-        const ageError = document.getElementById('ageError');
-        const birthError = document.getElementById('birthError');
-
-        // clear all errors
-        nameError.textContent = '';
-        ageError.textContent = '';
-        birthError.textContent = '';
-
-        let hasError = false;
-
-
-        if (!name) {
-            nameError.textContent = 'name required';
-            hasError = true;
-        }
-        if (!age) {
-            ageError.textContent = 'age required';
-            hasError = true;
-        }
-        if (!birthDate) {
-            birthError.textContent = 'birth required';
-            hasError = true;
-        }
-        if (hasError) {
-            return false; // prevent adding data
-        }
         sendPost(userForm);  
         //const catBreeds = userForm.querySelector('#catBreeds').value;  
         //catImage.src = catBreeds;
@@ -192,7 +189,7 @@
         <option value='/sphynx'>Sphynx</option>
         <option value='/scottishFold'>Scottish Fold</option>
         <option value='/siamese'>Siamese</option>
-        <option value='/maineCoon'>Maine Coon</option>
+        <option value='/exoticShorthair'>Exotic Shorthair</option>
         
         <option value='/americanShorthair'>American Shorthair</option>
       </select>

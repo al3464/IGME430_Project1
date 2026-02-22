@@ -65,22 +65,34 @@ const handlePost = (request, response, parsedUrl) => {
     }
   };
 
-  const urlStruct = {
-    '/': htmlHandler.getIndex,
-    '/style.css': cssHandler.getCssFile,
-    '/default': imgHandler.getDefault,
-    '/ragdoll': imgHandler.getRagdoll,
-    '/siamese': imgHandler.getSiamese,
-    '/bengal':imgHandler.getBengal,
-    '/exoticShorthair': imgHandler.getExoticShorthair,
-    '/maine': imgHandler.getMaine,
-    '/scottishFold': imgHandler.getScottishFold,
-    '/sphynx':imgHandler.getSphynx,
-    '/amShorthair':imgHandler.getAmShorthair,
-    notFound: htmlHandler.getIndex,
+  const handleGet = (request, response, parsedUrl) => {
+        const urlStruct = {
+        '/': htmlHandler.getIndex,
+        '/style.css': cssHandler.getCssFile,
+        '/default': imgHandler.getDefault,
+        '/ragdoll': imgHandler.getRagdoll,
+        '/siamese': imgHandler.getSiamese,
+        '/bengal':imgHandler.getBengal,
+        '/exoticShorthair': imgHandler.getExoticShorthair,
+        '/maine': imgHandler.getMaine,
+        '/scottishFold': imgHandler.getScottishFold,
+        '/sphynx':imgHandler.getSphynx,
+        '/amShorthair':imgHandler.getAmShorthair,
+        notFound: htmlHandler.getIndex,
+    }
 
-  }
+    const handler = urlStruct[parsedUrl.pathname];
+    if (handler) {
+      //pass in correct url
+      handler(request, response, parsedUrl);
+    } else {
+      // any invalid input will trigger notFound
+      urlStruct.notFound(request, response, parsedUrl);
+    }
   
+  }
+
+
  
 
   const onRequest = (request, response) => {
@@ -90,15 +102,7 @@ const handlePost = (request, response, parsedUrl) => {
     if (request.method === 'POST') {
         handlePost(request, response, parsedUrl);
       } else {
-        //handleGet(request, response, parsedUrl);
-        const handler = urlStruct[parsedUrl.pathname];
-        if (handler) {
-          //pass in correct url
-          handler(request, response, parsedUrl);
-        } else {
-          // any invalid input will trigger notFound
-          urlStruct.notFound(request, response, parsedUrl);
-        }
+        handleGet(request, response, parsedUrl);
       }
 }
 

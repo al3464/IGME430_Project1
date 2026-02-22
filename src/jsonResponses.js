@@ -50,15 +50,15 @@ const respondJSON = (request, response, status, object) => {
         return respondJSON(request, response, 400, responseJSON);
       }
       // default status code to 204 updated
-    let responseCode = 204;
+    //let responseCode = 204;
     // If the user doesn't exist yet
-  if (!cats[name]) {
+  //if (!cats[name]) {
     // Set the status code to 201 (created) and create an empty user
-    responseCode = 201;
+    let responseCode = 201;
     cats[name] = {
       name: name,
     };
-  }
+ // }
    // add or update fields for this user name
   
   cats[name].age = age;
@@ -66,7 +66,7 @@ const respondJSON = (request, response, status, object) => {
    if (responseCode === 201) {
     responseJSON.message = 'Created Successfully';
     return respondJSON(request, response, responseCode, responseJSON);
-  }
+  } 
 
   const getNotFound = (request, response) => {
     const acceptHeader = request.headers.accept;
