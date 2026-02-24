@@ -63,6 +63,12 @@ const handlePost = (request, response, parsedUrl) => {
       // jsonHandler.addUser function as the handler callback function.
       parseBody(request, response, jsonHandler.addCat);
     }
+
+    if (parsedUrl.pathname === '/updateCat') {
+        // Call our below parseBody handler, and in turn pass in the
+        // jsonHandler.addUser function as the handler callback function.
+        parseBody(request, response, jsonHandler.updateCat);
+      }
   };
 
   const handleGet = (request, response, parsedUrl) => {
@@ -78,7 +84,8 @@ const handlePost = (request, response, parsedUrl) => {
         '/scottishFold': imgHandler.getScottishFold,
         '/sphynx':imgHandler.getSphynx,
         '/amShorthair':imgHandler.getAmShorthair,
-        notFound: htmlHandler.getIndex,
+        '/getCats':jsonHandler.getCats,
+        notFound: jsonHandler.getNotFound,
     }
 
     const handler = urlStruct[parsedUrl.pathname];

@@ -43,38 +43,71 @@ const respondJSON = (request, response, status, object) => {
         message: 'Name and age are both required.',
       };
 
-      const { name, age } = request.body;
-
-      if (!name || !age) {
+      const {name, age, catBirth} = request.body;
+     
+      if (!name || !age || !catBirth) {
         responseJSON.id = 'missingParams';
         return respondJSON(request, response, 400, responseJSON);
       }
-      // default status code to 204 updated
-    //let responseCode = 204;
-    // If the user doesn't exist yet
-  //if (!cats[name]) {
-    // Set the status code to 201 (created) and create an empty user
-    let responseCode = 201;
-    cats[name] = {
-      name: name,
-    };
- // }
+ 
    // add or update fields for this user name
   
-  cats[name].age = age;
+   cats[name] = { name, age, catBirth };
+   return respondJSON(request, response, 201, {
+     message: 'Created Successfully',
+     cat: cats[name],
+   });
+ 
+}
 
-   if (responseCode === 201) {
-    responseJSON.message = 'Created Successfully';
-    return respondJSON(request, response, responseCode, responseJSON);
-  } 
 
-  const getNotFound = (request, response) => {
-    const acceptHeader = request.headers.accept;
-   return respondJSON(request, response, 404, '/notFound');
-  };
+const updateCat = (request, response) => {
+    const responseJSON = {
+        message: 'Name and age are both required.',
+      };
+
+      const {name, age, catBirth} = request.body;
+
+      if (!name || !age || !catBirth) {
+        responseJSON.id = 'missingParams';
+        return respondJSON(request, response, 400, responseJSON);
+      }
+ 9
+    
+  if (cats[name]) {
+      responseJSON.id = 'cat already exist'
+    // Set the status code to 201 (created) and create an empty user
+    return respondJSON(request, response, 204, responseJSON);
 
   }
 
+}
+
+// get cat's object
+// should calculate a 200
+const getCats = (request, response) => {
+    // json object to send
+    const responseJSON = {
+      cats,
+    };
+  
+    // return 200 with message
+    return respondJSON(request, response, 200, responseJSON);
+  };
+
+  const getNotFound = (request, response) => {
+    const responseJSON = {
+        message: 'The page you are looking for was not found.',
+      };
+    //const acceptHeader = request.headers.accept;
+   return respondJSON(request, response, 404, responseJSON);
+  };
+
+  
+
   module.exports = {
       addCat,
+      getNotFound,
+      updateCat,
+      getCats,
   }
