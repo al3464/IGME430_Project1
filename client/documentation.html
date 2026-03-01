@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Simple Video Stream</title>
+    <style>
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        
+        h1 {
+            text-align: center;
+            margin: 0 auto;
+            padding-top: 19%;
+            font-size: 2.6em;
+        }
+        
+    </style>
+</head>
+<body>
+  <h1>Project1 Documentation</h1>
+  <h3>Relative URL - All endpoints return JSON responses.</h3>
+  <p>GET: http://127.0.0.1:3000/getCats</p>
+  <p>The endpoint returns a JSON object with a cats property. </p>
+  <p>Example: {
+    "Creamy": {
+      "name": "Creamy",
+      "age": 6,
+      "catBirth": "2019-4-11",
+      "breedValue": "/ragdoll",
+      "breedText": "Ragdoll"
+    }
+}</p>
+  <p>Example query GET: http://127.0.0.1:3000/getCats?age=11</p>
+  <p>The query params is age. The example url can filter cat's information by specific age. </p>
+  <p></p>
+  <p>POST: /addCat</p>
+  <p>Add a new cat. Sucess input will return 201 and create a cat card. If any user input is empty will return 400 bad request.</p>
+  <p>POST: /updateCat</p>
+  <p>If the user add a repeat user name will trigger updateCat. updateCat will update an exsiting data and return a 204 no content to remind user this name is already exist. Will not create a new cat card.</p>
+  <h3>Query Params</h3>
+  <p>Query params: age Type: number Description: cat's information could filtered by age.</p>
+  <h3>Body Params</h3>
+  <p>Parameter: name Type: string Description: cat's name</p>
+  <p>Parameter: age Type: number Description: cat's age</p>
+  <p>Parameter: catBirth Type: string Description: cat's date of birth</p>
+  <p>Parameter: breedValue Type: string Description: example:/ragdoll to load cat's image</p>
+  <p>Parameter: breedText Type: string Description: cat's breed</p>
+  <h3>How To Use</h3>
+  <p>Simply fill in the name, birthday, and age, select the cat’s breed and press add, you’ll receive a cat card. It will also remind you how many days are left until your cat’s next birthday—or if it has already passed this year.</p>
+
+  
+
+</body>
+</html>

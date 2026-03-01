@@ -1,278 +1,347 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <title>ArcherLai_Project1</title>
-  <link rel="stylesheet" type="text/css" href="/style.css">
-  
-  <script> 
-  const handleResponse = async (response, parseResponse, catsData) => {
+    <title>ArcherLai_Project1</title>
+    <link rel="stylesheet" type="text/css" href="/style.css">
 
-      //Grab the name section so that we can handle repeat name error
-      const nameError = document.getElementById('nameEmpty');
+    <script>
+        //Handle response takes in the response object (from our fetch request), and 
+        //no actual response). It is marked as async because we will use await.
+        const handleResponse = async (response, parseResponse, catsData) => {
 
-    if(parseResponse && response.status !== 204) {
-        //Parse the response to json. This is an async function, so we will await it.
-        const obj = await response.json();
-        let jsonString = JSON.stringify(obj);
-        console.log(obj);
-    }
+            //Grab the name section so that we can handle repeat name error
+            const nameError = document.getElementById('nameEmpty');
 
-    const {name, ageNum, dateInput, breedValue, breedText} = catsData;
-    console.log(catsData);
-    /*formData = `name=${name} age=${ageNum} catBirth=${dateInput} breedValue=${breedValue} breedText${breedText} cardContainer=${cardContainer} MAX_CARDS=${MAX_CARDS}`;*/
+            if (parseResponse && response.status !== 204) {
+                //Parse the response to json. This is an async function, so we will await it.
+                const obj = await response.json();
+                let jsonString = JSON.stringify(obj);
+                console.log(obj);
+            }
 
-    if (response.status === 201) {
-    //create new card
-    createCatsCard(name, ageNum, dateInput, breedValue, breedText);
-    }
-    else if(response.status === 204){
-        //if the user type repeat cat's name then return nameerror content
-        nameError.textContent = 'repeat username';
-       
-       
-    }else{
-        console.log("invalid input")
-    }
-  }
-  
-  function createCatsCard(name, ageNum, dateInput, breedValue, breedText){
-    const cardContainer = document.getElementById('card-container');
-    const MAX_CARDS = 9;
-    const getMessage = getBirthdayMessage(name, ageNum, dateInput);
+            //Extract multiple properties at once from the catsData object for easier access.
+            const { name, ageNum, dateInput, breedValue, breedText } = catsData;
+            console.log(catsData);
 
-    if (cardContainer.children.length >= MAX_CARDS) {
-      alert(`${MAX_CARDS} cats maximum!`);
-      return;
-    }
+            if (response.status === 201) {
+                //create new card if return 201 status code
+                createCatsCard(name, ageNum, dateInput, breedValue, breedText);
+            }
+            else if (response.status === 204) {
+                //update exist card if return 204 status code
+                const cardContainer = document.getElementById('card-container');
+                //get exist name from exist cardConainer
+                let existingCard = null;
+                for (let i = 0; i < cardContainer.children.length; i++) {
+                    const card = cardContainer.children[i];
+                    if (card.dataset.name === name) {
+                        existingCard = card;
+                        break;
+                    }
+                }
+                if (existingCard) {
+                    //update new breed, age, catbirth, reminding message
+                    const img = existingCard.querySelector('img');
+                    img.src = breedValue;
+                    img.alt = breedText;
 
+                    const newCatsInfo = existingCard.querySelector('.cat-info');//locate cat info
+                    if (newCatsInfo) {
 
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.dataset.name = name; 
+                        newCatsInfo.innerHTML = `
+                                <p><b>Name:</b> ${name}</p>
+                                <p><b>Age:</b> ${ageNum}</p>
+                                <p><b>Breed:</b> ${breedText}</p>
+                                <p><b>Birthday:</b> ${dateInput}</p>
+                                `;
+                    }
+                    // create new message to replace old message
+                    const getNewMessage = getBirthdayMessage(name, ageNum, dateInput);
+                    const newMessage = document.createElement('div');
+                    newMessage.className = 'card-message';//locate the message
+                    newMessage.innerHTML = `<p>${getNewMessage}</p>`;
+                    existingCard.appendChild(newMessage);
+                    const oldMessage = existingCard.querySelector('.card-message');
+                    if (oldMessage) {
+                        existingCard.replaceChild(newMessage, oldMessage)
+                    }
 
-    const img = document.createElement('img');
-    img.src = breedValue;
-    img.alt = breedText;
-    img.onerror = () => img.src = '/default';
-
-    const catInfo = document.createElement('div');
-    catInfo.innerHTML = `
-      <p><strong>Name:</strong> ${name}</p>
-      <p><strong>Age:</strong> ${ageNum}</p>
-      <p><strong>Breed:</strong> ${breedText}</p>
-      <p><strong>Birthday:</strong> ${dateInput}</p>
-    `;
-
-    const catsMessage = document.createElement('div');
-    catsMessage.className = 'card-message';
-    catsMessage.innerHTML = `<p>${getMessage}</p>`;
-
-    card.appendChild(img);
-    card.appendChild(catInfo);
-    card.appendChild(catsMessage);
-    cardContainer.appendChild(card);
-    
-
-    return card;
-
-  }
-
-
-  function handleErrorInput(){
-
-        const name = userForm.querySelector('#nameField').value;
-        const age = userForm.querySelector('#ageField').value;
-        const ageNum = Number(age);
-        const dateInput = document.getElementById('start').value;
-      
-        const nameEmpty = document.getElementById('nameEmpty');
-        const ageEmpty = document.getElementById('ageEmpty');
-        const dateEmpty = document.getElementById('dateEmpty');
-
-        // clear all errors
-        nameEmpty.textContent = '';
-        ageEmpty.textContent = '';
-        dateEmpty.textContent = '';
-
-        let hasError = false;
-
-
-        if (!name) {
-            nameEmpty.textContent = 'name required';
-            hasError = true;
-        }
-        if (!age) {
-            ageEmpty.textContent = 'age required';
-            hasError = true;
-        }
-        if (!dateInput) {
-            dateEmpty.textContent = 'birth required';
-            hasError = true;
-        }
-        if (hasError) {
-            return false; // prevent adding data
-        }
-  }
-
-
- function getBirthdayMessage(name, ageNum, dateInput){
-
-        const selectedBirthday = new Date(dateInput + 'T00:00:00');
-        const today = new Date();
-        const selectDate = new Date(today.getFullYear(), selectedBirthday.getMonth(), selectedBirthday.getDate());
-        const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        const daysLeft = Math.round((todayDate - selectDate) / (1000 * 60 * 60 * 24));
-        const correctAge = today.getFullYear() - selectedBirthday.getFullYear();
-        const catsAge = ageNum + 1;
-
-
-        if (daysLeft > 0 && correctAge === ageNum) {
-            return `${name}'s birthday has already passed this year!`;
-        } else if (daysLeft < 0 && correctAge - 1 === ageNum) {
-            return `${name} will be ${catsAge} in ${daysLeft * -1} days!`;
-        } else if (daysLeft === 0 && correctAge === ageNum) {
-            return `${name}'s birthday is today! Happy Birthday!!`;
-        } else {
-            return `Your age and birth does not match.`;
+                }
+                //claim that the content has been upadted
+                nameError.textContent = 'repeat user name, content updated success';
+            } else {
+                console.log("invalid input")
+            }
         }
 
+        //create a cat card
+        function createCatsCard(name, ageNum, dateInput, breedValue, breedText) {
+            const cardContainer = document.getElementById('card-container');
+            const MAX_CARDS = 9;
+            //limit the amount of cat card to keep page clean
+            if (cardContainer.children.length >= MAX_CARDS) {
+                alert(`${MAX_CARDS} cats maximum!`);
+                return;
+            }
 
-  }
+            //create a card frame
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.dataset.name = name;//get name to trigger the existingCard params
 
-  const requestGet = async () => {
-    const getCats = '/getCats'
-    //Grab the url and method from the html form below
-    let response = await fetch(getCats, {
-      method: 'GET',
-      headers: {
-          'Accept': "application/json",
-      },
-    });
+            //initialize all required information for cat card
+            //get cat's image
+            const img = document.createElement('img');
+            img.src = breedValue;
+            img.alt = breedText;
+            img.onerror = function () {
+                img.src = '/default';
+            };
 
-    const data = await response.json();
-    const cats = data.cats;
-    Object.values(cats).forEach(cat => {
-        // 为每只猫创建卡片（你需要知道品种，但服务器可能没存品种）
-        // 这里需要根据实际存储的数据调整，如果没存品种，可用默认品种
-        const [y, m, d] = cat.catBirth.split('-');
-        const catBirth = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+            //get cat's basic info
+            const catInfo = document.createElement('div');
+            catInfo.className = 'cat-info';
+            catInfo.innerHTML = `
+                                <p><b>Name:</b> ${name}</p>
+                                <p><b>Age:</b> ${ageNum}</p>
+                                <p><b>Breed:</b> ${breedText}</p>
+                                <p><b>Birthday:</b> ${dateInput}</p>
+                                                                    `;
 
-        createCatsCard(cat.name, cat.age, catBirth, cat.breedValue, cat.breedText); 
-    });
-        
-}
+            //get cat's birthday remind message                                                     
+            const catsMessage = document.createElement('div');
+            const getMessage = getBirthdayMessage(name, ageNum, dateInput);
+            catsMessage.className = 'card-message';
+            catsMessage.innerHTML = `<p>${getMessage}</p>`;
 
-  const sendPost = async (userForm) => {
-      
-      const name = userForm.querySelector('#nameField').value;
-      const age = userForm.querySelector('#ageField').value;
-      const ageNum = Number(age);
-      const dateInput = document.getElementById('start').value;
-      const breedSelect = userForm.querySelector('#catBreeds');
-      const breedValue = breedSelect.value;     
-      const breedText = breedSelect.options[breedSelect.selectedIndex].text;
+            card.appendChild(img);
+            card.appendChild(catInfo);
+            card.appendChild(catsMessage);
+            cardContainer.appendChild(card);
 
-      handleErrorInput();
-        const method = userForm.getAttribute('method');
-    
-        const birthDate = userForm.querySelector('#start').value;
-        const birthdayMessage = document.createElement('div');
-    
-        let formData = `name=${name}&age=${ageNum}&catBirth=${dateInput}&breed=${breedText}`;
+            return card;
 
-      const catsData  = {
-          name,
-          ageNum,
-          dateInput,
-          breedValue,
-          breedText,        
-      }
+        }
 
-      console.log(formData);
+        //if user forget to type in any of the blank area. return error remind
+        function handleErrorInput() {
+
+            //initialize needed data from body section
+            const name = userForm.querySelector('#nameField').value;
+            const age = userForm.querySelector('#ageField').value;
+            const dateInput = document.getElementById('start').value;
+
+            const nameEmpty = document.getElementById('nameEmpty');
+            const ageEmpty = document.getElementById('ageEmpty');
+            const dateEmpty = document.getElementById('dateEmpty');
+
+            //set a bool value to test if any params is empty.
+            let error = false;
+
+            if (!name) {
+                nameEmpty.textContent = 'name required';
+                error = true;
+            }
+            if (!age) {
+                ageEmpty.textContent = 'age required';
+                error = true;
+            }
+            if (!dateInput) {
+                dateEmpty.textContent = 'birth required';
+                error = true;
+            }
+            if (error) {
+                return false; // prevent adding card
+            }
+
+            // if user fix error, clear the error message
+            nameEmpty.textContent = '';
+            ageEmpty.textContent = '';
+            dateEmpty.textContent = '';
+        }
+
+        //get birthday reminder message calculated
+        function getBirthdayMessage(name, ageNum, dateInput) {
+
+            //get date of birth from dateInput
+            const selectedBirthday = new Date(dateInput + 'T00:00:00');
+            //get today's date 
+            const today = new Date();
+
+            //Get the year, month, and day of a date individually.
+            const selectDate = new Date(today.getFullYear(), selectedBirthday.getMonth(), selectedBirthday.getDate());
+            const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+            //calculate days left from birthday 
+            const daysLeft = Math.round((todayDate - selectDate) / (1000 * 60 * 60 * 24));
+            //calculate if the date of birth match the age
+            const correctAge = today.getFullYear() - selectedBirthday.getFullYear();
+            const catsAge = ageNum + 1;
+
+            //set different responses for all situations
+            if (daysLeft > 0 && correctAge === ageNum) {
+                return `${name}'s birthday has already passed this year!`;
+            } else if (daysLeft < 0 && correctAge - 1 === ageNum) {
+                return `${name} will be ${catsAge} in ${daysLeft * -1} days!`;
+            } else if (daysLeft === 0 && correctAge === ageNum) {
+                return `${name}'s birthday is today! Happy Birthday!!`;
+            } else {
+                return `Your age and birth does not match.`;
+            }
+
+        }
+
+        //create get request
+        const requestGet = async () => {
+            const getCats = '/getCats'
+            //Grab the url and method from the html form below
+            let response = await fetch(getCats, {
+                method: 'GET',
+                headers: {
+                    'Accept': "application/json",
+                },
+            });
+
+            //get data from jsonResponses.getCats
+            const data = await response.json();
+            const cats = data.cats;
+            //create cards for each cats 
+            Object.values(cats).forEach(cat => {
+
+                //A complex date parsing method that breaks down a date into parameters recognizable by birthday message function.
+                const [y, m, d] = cat.catBirth.split('-');
+                const catBirth = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+
+                //call createCard function to pass in all the cat's data for cat's card
+                createCatsCard(cat.name, cat.age, catBirth, cat.breedValue, cat.breedText);
+            });
+
+        }
+
+        //create POST request
+        const sendPost = async (userForm) => {
+            //Grab all the info from the form
+            const name = userForm.querySelector('#nameField').value;
+            const age = userForm.querySelector('#ageField').value;
+            const ageNum = Number(age);
+            const dateInput = document.getElementById('start').value;
+            const breedSelect = userForm.querySelector('#catBreeds');
+            const breedValue = breedSelect.value;
+            const breedText = breedSelect.options[breedSelect.selectedIndex].text;
 
 
-        const cardContainer = document.getElementById('card-container');
-        const existingCard = Array.from(cardContainer.children).find(
-            card => card.dataset.name === name
-        );
-      console.log(existingCard);
-       
-        const url = existingCard ? '/updateCat' : '/addCat';
-        //Make a fetch request and await a response. Set the method to
-      //the one provided by the form (POST). Set the headers. Content-Type
-      //is the type of data we are sending. Accept is the data we would like
-      //in response. Then add our FORM-URLENCODED string as the body of the request.
-      const response = await fetch(url, {
-        method: method,
-        headers: {
-          'Content-Type':'application/x-www-form-urlencoded',
-          'Accept': 'application/json',
-        },
-        body: formData,
-      });
+            let formData = `name=${name}&age=${ageNum}&catBirth=${dateInput}&breed=${breedText}`;
+            /*formData = `name=${name} age=${ageNum} catBirth=${dateInput} breedValue=${breedValue} breedText${breedText} cardContainer=${cardContainer} MAX_CARDS=${MAX_CARDS}`;*/
+            console.log(formData);//check the formdata's input
 
-      //Once we have a response, handle it.
-      handleResponse(response, method === 'post', catsData);
-    };
+            handleErrorInput();//call handleError function to handle the empty input
+
+            //initialize catsData and stored all the info
+            const catsData = {
+                name,
+                ageNum,
+                dateInput,
+                breedValue,
+                breedText,
+            }
+            
+            //use existingCard value to check the repeat username to return 204 status code
+            const cardContainer = document.getElementById('card-container');
+            let existingCard = null;
+            for (let i = 0; i < cardContainer.children.length; i++) {
+                const card = cardContainer.children[i];
+                if (card.dataset.name === name) {
+                    existingCard = card;
+                    break;
+                }
+            }
+            //check the existing card working or not 
+            console.log(existingCard);
+
+            //Make a fetch request and await a response. Set the method to
+            //the one provided by the form (POST). Set the headers. Content-Type
+            //is the type of data we are sending. Accept is the data we would like
+            //in response. Then add our FORM-URLENCODED string as the body of the request.
+            //set ternary operator for the url to decide the value of url
+            const url = existingCard ? '/updateCat' : '/addCat';
+            const method = userForm.getAttribute('method');
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Accept': 'application/json',
+                },
+                body: formData,
+            });
+
+            //Once we have a response, handle it.
+            handleResponse(response, method === 'post', catsData);
+        };
+
+        //initialize the page
+        const init = () => {
+            //grab form
+            const userForm = document.querySelector('#userForm');
+            //const catImage = document.getElementById('catImage');
+            //send addCat
+            const addCat = (e) => {
+                e.preventDefault();
+                sendPost(userForm);
+                userForm.reset();
+                //const catBreeds = userForm.querySelector('#catBreeds').value;  
+                //catImage.src = catBreeds;
+                //  <img id="catImage" src="default" width="600" height="400">
+                return false;
+            }
+            //call GET request 
+            requestGet();
+            //Call addUser when the submit event fires on the form.
+            userForm.addEventListener('submit', addCat);
+        };
+
+        window.onload = init;
 
 
-  const init = () => {
-      //grab form
-        const userForm = document.querySelector('#userForm');
-        //const catImage = document.getElementById('catImage');
-      const addCat = (e) => {
-        e.preventDefault();
-        sendPost(userForm);  
-        
-        //const catBreeds = userForm.querySelector('#catBreeds').value;  
-        //catImage.src = catBreeds;
-        //  <img id="catImage" src="default" width="600" height="400">
-        return false;
-      }
-        requestGet();
-      //Call addUser when the submit event fires on the form.
-      userForm.addEventListener('submit', addCat);
-    };
-    
-    window.onload = init;
-
-      
-  </script>
+    </script>
 </head>
-<body>
-  <section id="top">
-    <h3>Kitten Birthday Log</h3>
-    <div>fill out below's info to create cat's card!</div>
-    <div id="card-container" class="card-container"></div>
-    <form id="userForm" action="/addCat" method="post">
-    <label for="start">Meow's Date of Birth</label>
-    <input type="date" id="start" name="trip-start" min="1990-01-01" max="2026-12-31">
-    <span id="dateEmpty" class="error"></span>
-  
-    
-      <label for="name">Name </label>
-      <input id="nameField" type="text" name="name" />
-      <span id="nameEmpty" class="error"></span>
 
-      <label for="age">Age </label>
-      <input id="ageField" type="number" name="age" min="0" max="100" step="1"/>
-      <span id="ageEmpty" class="error"></span>
-      
-      <label for="breeds">Cat Breed </label>
-      <select id='catBreeds'>
-        <option value='/ragdoll'>Ragdoll</option>
-        <option value='/maine'>Maine</option>
-        <option value='/bengal'>Bengal</option>
-        <option value='/sphynx'>Sphynx</option>
-        <option value='/scottishFold'>Scottish Fold</option>
-        <option value='/siamese'>Siamese</option>
-        <option value='/exoticShorthair'>Exotic Shorthair</option>
-        
-        <option value='/amShorthair'>American Shorthair</option>
-      </select>
-      <input type="submit" value="Add" />
-    </form>
-  </section>
+<body>
+    <section id="top">
+        <h3>Kitten Birthday Log</h3>
+        <div>fill out below's info to create cat's card!</div>
+        <div id="card-container" class="card-container"></div>
+        <form id="userForm" action="/addCat" method="post">
+            <label for="start">Meow's Date of Birth</label>
+            <input type="date" id="start" name="trip-start" min="1990-01-01" max="2026-12-31">
+            <span id="dateEmpty" class="error"></span>
+
+
+            <label for="name">Name </label>
+            <input id="nameField" type="text" name="name" />
+            <span id="nameEmpty" class="error"></span>
+
+            <label for="age">Age </label>
+            <input id="ageField" type="number" name="age" min="0" max="100" step="1" />
+            <span id="ageEmpty" class="error"></span>
+
+            <label for="breeds">Cat Breed </label>
+            <select id='catBreeds'>
+                <option value='/ragdoll'>Ragdoll</option>
+                <option value='/maine'>Maine</option>
+                <option value='/bengal'>Bengal</option>
+                <option value='/sphynx'>Sphynx</option>
+                <option value='/scottishFold'>Scottish Fold</option>
+                <option value='/siamese'>Siamese</option>
+                <option value='/exoticShorthair'>Exotic Shorthair</option>
+
+                <option value='/amShorthair'>American Shorthair</option>
+            </select>
+            <input type="submit" value="Add" />
+            <a href="/documentation" class="doc-link">Documentation</a>
+        </form>
+    </section>
 
 </body>
+
 </html>
