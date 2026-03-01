@@ -7,14 +7,14 @@
   <script> 
   const handleResponse = async (response, parseResponse, catsData) => {
 
-      //Grab the content section so that we can write to it
-      const content = document.querySelector('#content');
- 
+      //Grab the name section so that we can handle repeat name error
+      const nameError = document.getElementById('nameEmpty');
+
     if(parseResponse && response.status !== 204) {
         //Parse the response to json. This is an async function, so we will await it.
         const obj = await response.json();
         let jsonString = JSON.stringify(obj);
-        console.log(jsonString);
+        console.log(obj);
     }
 
     const {name, ageNum, dateInput, breedValue, breedText} = catsData;
@@ -26,10 +26,12 @@
     createCatsCard(name, ageNum, dateInput, breedValue, breedText);
     }
     else if(response.status === 204){
-    content.innerHTML = `<p>repeat username</p>`;
-
+        //if the user type repeat cat's name then return nameerror content
+        nameError.textContent = 'repeat username';
+       
+       
     }else{
-    content.innerHTML = `<p>invalid input</p>`;
+        console.log("invalid input")
     }
   }
   
@@ -43,6 +45,7 @@
       return;
     }
 
+
     const card = document.createElement('div');
     card.className = 'card';
     card.dataset.name = name; 
@@ -52,17 +55,65 @@
     img.alt = breedText;
     img.onerror = () => img.src = '/default';
 
+    const catInfo = document.createElement('div');
+    catInfo.innerHTML = `
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Age:</strong> ${ageNum}</p>
+      <p><strong>Breed:</strong> ${breedText}</p>
+      <p><strong>Birthday:</strong> ${dateInput}</p>
+    `;
+
     const catsMessage = document.createElement('div');
     catsMessage.className = 'card-message';
     catsMessage.innerHTML = `<p>${getMessage}</p>`;
 
     card.appendChild(img);
+    card.appendChild(catInfo);
     card.appendChild(catsMessage);
     cardContainer.appendChild(card);
+    
 
     return card;
 
   }
+
+
+  function handleErrorInput(){
+
+        const name = userForm.querySelector('#nameField').value;
+        const age = userForm.querySelector('#ageField').value;
+        const ageNum = Number(age);
+        const dateInput = document.getElementById('start').value;
+      
+        const nameEmpty = document.getElementById('nameEmpty');
+        const ageEmpty = document.getElementById('ageEmpty');
+        const dateEmpty = document.getElementById('dateEmpty');
+
+        // clear all errors
+        nameEmpty.textContent = '';
+        ageEmpty.textContent = '';
+        dateEmpty.textContent = '';
+
+        let hasError = false;
+
+
+        if (!name) {
+            nameEmpty.textContent = 'name required';
+            hasError = true;
+        }
+        if (!age) {
+            ageEmpty.textContent = 'age required';
+            hasError = true;
+        }
+        if (!dateInput) {
+            dateEmpty.textContent = 'birth required';
+            hasError = true;
+        }
+        if (hasError) {
+            return false; // prevent adding data
+        }
+  }
+
 
  function getBirthdayMessage(name, ageNum, dateInput){
 
@@ -103,10 +154,12 @@
     Object.values(cats).forEach(cat => {
         // 为每只猫创建卡片（你需要知道品种，但服务器可能没存品种）
         // 这里需要根据实际存储的数据调整，如果没存品种，可用默认品种
-        createCatsCard(cat.name, cat.ageNum, cat.dateInput, '/default'); 
+        const [y, m, d] = cat.catBirth.split('-');
+        const catBirth = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+
+        createCatsCard(cat.name, cat.age, catBirth, cat.breedValue, cat.breedText); 
     });
         
-   // handleResponse(response, type);
 }
 
   const sendPost = async (userForm) => {
@@ -119,42 +172,13 @@
       const breedValue = breedSelect.value;     
       const breedText = breedSelect.options[breedSelect.selectedIndex].text;
 
-
-      const nameError = document.getElementById('nameError');
-        const ageError = document.getElementById('ageError');
-        const birthError = document.getElementById('birthError');
-
-        // clear all errors
-        nameError.textContent = '';
-        ageError.textContent = '';
-        birthError.textContent = '';
-
-        let hasError = false;
-
-
-        if (!name) {
-            nameError.textContent = 'name required';
-            hasError = true;
-        }
-        if (!age) {
-            ageError.textContent = 'age required';
-            hasError = true;
-        }
-        if (!dateInput) {
-            birthError.textContent = 'birth required';
-            hasError = true;
-        }
-        if (hasError) {
-            return false; // prevent adding data
-        }
-
- 
+      handleErrorInput();
         const method = userForm.getAttribute('method');
     
         const birthDate = userForm.querySelector('#start').value;
         const birthdayMessage = document.createElement('div');
-  
-        let formData = `name=${name}&age=${ageNum}&catBirth=${dateInput}`;
+    
+        let formData = `name=${name}&age=${ageNum}&catBirth=${dateInput}&breed=${breedText}`;
 
       const catsData  = {
           name,
@@ -219,22 +243,20 @@
   <section id="top">
     <h3>Kitten Birthday Log</h3>
     <div>fill out below's info to create cat's card!</div>
-    <section id="content">
-    </section>
     <div id="card-container" class="card-container"></div>
     <form id="userForm" action="/addCat" method="post">
     <label for="start">Meow's Date of Birth</label>
     <input type="date" id="start" name="trip-start" min="1990-01-01" max="2026-12-31">
-    <span id="birthError" class="error"></span>
+    <span id="dateEmpty" class="error"></span>
   
     
       <label for="name">Name </label>
       <input id="nameField" type="text" name="name" />
-      <span id="nameError" class="error"></span>
+      <span id="nameEmpty" class="error"></span>
 
       <label for="age">Age </label>
       <input id="ageField" type="number" name="age" min="0" max="100" step="1"/>
-      <span id="ageError" class="error"></span>
+      <span id="ageEmpty" class="error"></span>
       
       <label for="breeds">Cat Breed </label>
       <select id='catBreeds'>
@@ -246,7 +268,7 @@
         <option value='/siamese'>Siamese</option>
         <option value='/exoticShorthair'>Exotic Shorthair</option>
         
-        <option value='/americanShorthair'>American Shorthair</option>
+        <option value='/amShorthair'>American Shorthair</option>
       </select>
       <input type="submit" value="Add" />
     </form>

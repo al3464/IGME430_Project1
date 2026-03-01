@@ -1,16 +1,13 @@
-const cats = {};
+const fs = require('fs');
+const path = require('path');
+const dataPath = path.join(`${__dirname}/../CatsData/cat.json`);
+let cats = {};
+try {
+  cats = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+} catch (err) {
+  console.error('cats is not loaded, loaded failed.');
+}
 
-const statusCodes = {
-    '/success': { code: 200, message: 'This is a successful response.' },
-    '/created': { code: 201, message: 'Resource created successfully.' },
-    '/noContent': { code: 204, message: 'Request successful, but no content to return.' },
-    '/badRequest': { code: 400, message: 'Missing valid query parameter set to true.' },
-    '/unauthorized': { code: 401, message: 'Missing loggedIn query parameter.' },
-    '/forbidden': { code: 403, message: 'You do not have access to this content.' },
-    '/internal': { code: 500, message: 'Internal Server Error.Something went wrong.' },
-    '/notImplemented': { code: 501, message: 'A get request for this page has not been implemented yet. Check again later for update content.' },
-    '/notFound': { code: 404, message: 'The page you are looking for was not found.' }
-  };
 // takes request, response, status code and object to send
 const respondJSON = (request, response, status, object) => {
     const content = JSON.stringify(object);
@@ -40,10 +37,10 @@ const respondJSON = (request, response, status, object) => {
 
   const addCat = (request, response) => {
     const responseJSON = {
-        message: 'Name and age are both required.',
+        message: 'Name and age and date are required.',
       };
 
-      const {name, age, catBirth} = request.body;
+      const {name, age, catBirth, breed} = request.body;
      
       if (!name || !age || !catBirth) {
         responseJSON.id = 'missingParams';
@@ -52,7 +49,7 @@ const respondJSON = (request, response, status, object) => {
  
    // add or update fields for this user name
   
-   cats[name] = { name, age, catBirth };
+   cats[name] = { name, age, catBirth, breed };
    return respondJSON(request, response, 201, {
      message: 'Created Successfully',
      cat: cats[name],
@@ -72,7 +69,7 @@ const updateCat = (request, response) => {
         responseJSON.id = 'missingParams';
         return respondJSON(request, response, 400, responseJSON);
       }
- 9
+ 
     
   if (cats[name]) {
       responseJSON.id = 'cat already exist'
@@ -85,14 +82,31 @@ const updateCat = (request, response) => {
 
 // get cat's object
 // should calculate a 200
-const getCats = (request, response) => {
+const getCats = (request, response, parsedUrl) => {
+    const ageFilter = parsedUrl.searchParams.get('age');
     // json object to send
     const responseJSON = {
-      cats,
+        cats,
     };
-  
+
+   
+    if (ageFilter) {
+        
+            let result = Object.fromEntries(
+            Object.entries(cats).filter(entry => {
+            const cat = entry[1];
+            return cat.age === ageFilter;
+        })
+        )
+
+        return respondJSON(request, response, 200, {cats: result});
+
+      }else{
+            return respondJSON(request, response, 200, responseJSON);
+      }
+      
     // return 200 with message
-    return respondJSON(request, response, 200, responseJSON);
+  
   };
 
   const getNotFound = (request, response) => {

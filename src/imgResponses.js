@@ -16,6 +16,12 @@ const catImages = {
 // pull in the file system module
 const sendImage = (request, response, imageKey) => {
     const imageData = catImages[imageKey];
+    
+    const headers = {
+        'Content-Type': 'image/png',
+        'Content-Length': imageData.length,
+      };
+
     if (!imageData) {
       response.writeHead(404, { 'Content-Type': 'text/plain' });
       response.write('Image not found');
@@ -23,7 +29,7 @@ const sendImage = (request, response, imageKey) => {
       return;
     }
     
-    response.writeHead(200, { 'Content-Type': 'image/jpg' });
+    response.writeHead(200, headers);
     response.write(imageData);
     response.end();
   };

@@ -85,6 +85,7 @@ const handlePost = (request, response, parsedUrl) => {
         '/sphynx':imgHandler.getSphynx,
         '/amShorthair':imgHandler.getAmShorthair,
         '/getCats':jsonHandler.getCats,
+        '/documentation': htmlHandler.getDocumentation,
         notFound: jsonHandler.getNotFound,
     }
 
