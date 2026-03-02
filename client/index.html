@@ -81,7 +81,7 @@
             const MAX_CARDS = 9;
             //limit the amount of cat card to keep page clean
             if (cardContainer.children.length >= MAX_CARDS) {
-                alert(`${MAX_CARDS} cats maximum!`);
+                console.log(`${MAX_CARDS} cats maximum!`);
                 return;
             }
 
@@ -274,7 +274,7 @@
                 },
                 body: formData,
             });
-
+            
             //Once we have a response, handle it.
             handleResponse(response, method === 'post', catsData);
         };

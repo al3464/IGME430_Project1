@@ -22,6 +22,7 @@
 </head>
 <body>
   <h1>Project1 Documentation</h1>
+  <a href="/" class="doc-link">Cat App</a>
   <h3>Relative URL - All endpoints return JSON responses.</h3>
   <p>GET: http://127.0.0.1:3000/getCats</p>
   <p>The endpoint returns a JSON object with a cats property. </p>
@@ -34,9 +35,10 @@
       "breedText": "Ragdoll"
     }
 }</p>
+    <p>Status Code GET: /getSuccess /getBadRequest /getUpdated /getCreated </p>
   <p>Example query GET: http://127.0.0.1:3000/getCats?age=11</p>
   <p>The query params is age. The example url can filter cat's information by specific age. </p>
-  <p></p>
+  <p>Status Code GET: /getSuccess /getBadRequest /getUpdated /getCreated </p>
   <p>POST: /addCat</p>
   <p>Add a new cat. Sucess input will return 201 and create a cat card. If any user input is empty will return 400 bad request.</p>
   <p>POST: /updateCat</p>
@@ -50,7 +52,8 @@
   <p>Parameter: breedValue Type: string Description: example:/ragdoll to load cat's image</p>
   <p>Parameter: breedText Type: string Description: cat's breed</p>
   <h3>How To Use</h3>
-  <p>Simply fill in the name, birthday, and age, select the cat’s breed and press add, you’ll receive a cat card. It will also remind you how many days are left until your cat’s next birthday—or if it has already passed this year.</p>
+  <p>Simply fill in the name, birthday, and age, select the cat's breed and press add, you'll receive a cat card. It will also remind you how many days are left until your cat's next birthday or if it has already passed this year.</p>
+  <p>If you fill in repeat user name, below name section will give you a repeat name reminder and also your new information will update to the exist cat card. This function is to prevent user from filling wrong age or birth</p>
 
   
 

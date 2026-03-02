@@ -9,6 +9,14 @@ try {
     console.error('cats is not loaded, loaded failed.');
 }
 
+const statusCodes = {
+    '/success': { code: 200, message: 'This is a successful response.' },
+    '/badRequest': { code: 400, message: 'Missing valid query parameter set to true.' },
+    '/created': { code: 201, message: 'created successful' },
+    '/updated': { code: 204, message: 'update(No content)' },
+    '/notFound': { code: 404, message: 'The page you are looking for was not found.' }
+};
+
 // takes request, response, status code and object to send
 const respondJSON = (request, response, status, object) => {
     const content = JSON.stringify(object);
@@ -59,7 +67,7 @@ const addCat = (request, response) => {
     cats[name] = { name, age, catBirth, breed };
     // if response is created, then set our created message
     // and sent response with a messageß
-    return respondJSON(request, response, 201, {
+    return respondJSON(request, response, statusCodes['/created'].code, {
         message: 'Created Successfully',
         cat: cats[name],
     });
@@ -74,11 +82,11 @@ const updateCat = (request, response) => {
         message: 'Name and age are both required.',
     };
 
-    const { name, age, catBirth} = request.body;
+    const { name, age, catBirth } = request.body;
 
     if (!name || !age || !catBirth) {
         responseJSON.id = 'missingParams';
-        return respondJSON(request, response, 400, responseJSON);
+        return respondJSON(request, response, statusCodes['/badRequest'].code, responseJSON);
     }
 
 
@@ -88,7 +96,7 @@ const updateCat = (request, response) => {
         // body. However, if we didn't pass in an object as the 4th param
         // to our respondJSON function it would break. So we send in an
         // empty object, which will stringify to an empty string.
-        return respondJSON(request, response, 204, {});
+        return respondJSON(request, response, statusCodes['/updated'].code, {});
 
     }
 
@@ -113,14 +121,14 @@ const getCats = (request, response, parsedUrl) => {
             }
         }
 
-        return respondJSON(request, response, 200, { cats: result });
+        return respondJSON(request, response,statusCodes['/success'].code, { cats: result });
 
     } else {
         // return 200 with message
-        return respondJSON(request, response, 200, responseJSON);
+        return respondJSON(request, response, statusCodes['/success'].code, responseJSON);
     }
 
-    
+
 
 };
 
@@ -131,14 +139,32 @@ const getNotFound = (request, response) => {
         message: 'The page you are looking for was not found.',
     };
     //const acceptHeader = request.headers.accept;
-    return respondJSON(request, response, 404, responseJSON);
+    return respondJSON(request, response, statusCodes['/notFound'].code, responseJSON);
 };
 
 
+const getSuccess = (request, response) => {
+    respondJSON(request, response, statusCodes['/success'].code, statusCodes['/success'].message);
+  };
 
+  const getBadRequest = (request, response) => {
+    respondJSON(request, response, statusCodes['/badRequest'].code, statusCodes['/badRequest'].message);
+  };
+
+  const getUpdated = (request, response) => {
+    respondJSON(request, response, statusCodes['/updated'].code, statusCodes['/updated'].message);
+  };
+
+  const getCreated = (request, response) => {
+    respondJSON(request, response, statusCodes['/created'].code, statusCodes['/created'].message);
+  };
 module.exports = {
     addCat,
     getNotFound,
     updateCat,
     getCats,
+    getSuccess,
+    getCreated,
+    getUpdated,
+    getBadRequest,
 }

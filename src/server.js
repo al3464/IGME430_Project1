@@ -87,6 +87,10 @@ const handleGet = (request, response, parsedUrl) => {
         '/amShorthair': imgHandler.getAmShorthair,
         '/getCats': jsonHandler.getCats,
         '/documentation': htmlHandler.getDocumentation,
+        '/getSuccess': jsonHandler.getSuccess,
+        '/getCreated': jsonHandler.getCreated,
+        '/getUpdated': jsonHandler.getUpdated,
+        '/getBadRequest': jsonHandler.getBadRequest,
         notFound: jsonHandler.getNotFound,
     }
 
