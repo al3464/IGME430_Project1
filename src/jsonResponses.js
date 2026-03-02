@@ -6,7 +6,7 @@ let cats = {};
 try {
     cats = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 } catch (err) {
-    console.error('cats is not loaded, loaded failed.');
+    console.error('cats is not loaded, loaded failed.',err.message);
 }
 
 const statusCodes = {
