@@ -15,9 +15,9 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
+    "pretest": "eslint ./src --fix",
     "test": "echo \"Test Complete\"",
-    "start": "node ./src/server.js",
-    "pretest": "eslint ./src --fix"
+    "start": "node ./src/server.js"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
