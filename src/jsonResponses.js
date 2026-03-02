@@ -74,7 +74,7 @@ const updateCat = (request, response) => {
         message: 'Name and age are both required.',
     };
 
-    const { name, age, catBirth, breed } = request.body;
+    const { name, age, catBirth} = request.body;
 
     if (!name || !age || !catBirth) {
         responseJSON.id = 'missingParams';
