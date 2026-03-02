@@ -245,7 +245,7 @@
                 breedValue,
                 breedText,
             }
-            
+
             //use existingCard value to check the repeat username to return 204 status code
             const cardContainer = document.getElementById('card-container');
             let existingCard = null;
@@ -274,7 +274,7 @@
                 },
                 body: formData,
             });
-            
+
             //Once we have a response, handle it.
             handleResponse(response, method === 'post', catsData);
         };
@@ -308,38 +308,50 @@
 
 <body>
     <section id="top">
-        <h3>Kitten Birthday Log</h3>
-        <div>fill out below's info to create cat's card!</div>
-        <div id="card-container" class="card-container"></div>
-        <form id="userForm" action="/addCat" method="post">
-            <label for="start">Meow's Date of Birth</label>
-            <input type="date" id="start" name="trip-start" min="1990-01-01" max="2026-12-31">
-            <span id="dateEmpty" class="error"></span>
+        <div id="leftbar">
+            <div id="card-container" class="card-container"></div>
+        </div>
 
+        <div id="rightbar">
+            <h3>Kitten Birthday Log</h3>
+            <div id="instruct">Fill out the form and get a cat card!</div>
 
-            <label for="name">Name </label>
-            <input id="nameField" type="text" name="name" />
-            <span id="nameEmpty" class="error"></span>
+            <form id="userForm" action="/addCat" method="post">
+                <div class=rowText>
+                    <label for="start">Date of Birth</label>
+                    <input type="date" id="start" name="trip-start" min="1990-01-01" max="2026-12-31">
+                    <span id="dateEmpty" class="error"></span>
+                </div>
 
-            <label for="age">Age </label>
-            <input id="ageField" type="number" name="age" min="0" max="100" step="1" />
-            <span id="ageEmpty" class="error"></span>
+                <div class=rowText>
+                    <label for="name">Name </label>
+                    <input id="nameField" type="text" name="name" />
+                    <span id="nameEmpty" class="error"></span>
+                </div>
 
-            <label for="breeds">Cat Breed </label>
-            <select id='catBreeds'>
-                <option value='/ragdoll'>Ragdoll</option>
-                <option value='/maine'>Maine</option>
-                <option value='/bengal'>Bengal</option>
-                <option value='/sphynx'>Sphynx</option>
-                <option value='/scottishFold'>Scottish Fold</option>
-                <option value='/siamese'>Siamese</option>
-                <option value='/exoticShorthair'>Exotic Shorthair</option>
+                <div class=rowText>
+                    <label for="age">Age </label>
+                    <input id="ageField" type="number" name="age" min="0" max="100" step="1" />
+                    <span id="ageEmpty" class="error"></span>
+                </div>
+                <div class=rowText>
+                    <label for="breeds">Cat Breed </label>
+                    <select id='catBreeds'>
+                        <option value='/ragdoll'>Ragdoll</option>
+                        <option value='/maine'>Maine</option>
+                        <option value='/bengal'>Bengal</option>
+                        <option value='/sphynx'>Sphynx</option>
+                        <option value='/scottishFold'>Scottish Fold</option>
+                        <option value='/siamese'>Siamese</option>
+                        <option value='/exoticShorthair'>Exotic Shorthair</option>
 
-                <option value='/amShorthair'>American Shorthair</option>
-            </select>
-            <input type="submit" value="Add" />
-            <a href="/documentation" class="doc-link">Documentation</a>
-        </form>
+                        <option value='/amShorthair'>American Shorthair</option>
+                    </select>
+                </div>
+                <input type="submit" value="Add" />
+                <a href="/documentation" class="doc-link">Documentation</a>
+            </form>
+        </div>
     </section>
 
 </body>
